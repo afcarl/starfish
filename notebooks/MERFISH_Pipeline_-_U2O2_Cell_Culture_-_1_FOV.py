@@ -111,23 +111,15 @@ glp.filter(s)
 # EPY: END code
 
 # EPY: START markdown
-# Use MERFISH-calculated size factors to scale the channels across the hybridization rounds and visualize the resulting filtered and scaled images. Right now we have to extract this information from the metadata and apply this transformation manually. 
+# Use MERFISH-calculated size factors to scale the channels across the hybridization rounds and visualize the resulting filtered and scaled images. Right now we have to extract this information from the metadata and apply this transformation manually.
 # EPY: END markdown
 
 # EPY: START code
-scale_factors = {}
-tile_barcode_indices = {}
-for tile in s.image._image_partition.tiles():
-    h = tile.indices['h']
-    c = tile.indices['c']
-    bci = tile.extras['barcode_index']
-    sf = tile.extras['scale_factor']
-    scale_factors[(h, c)] = sf
-    tile_barcode_indices[(h, c)] = bci
+scale_factors = {(t['h'], t['c']): t['scale_factor'] for index, t in s.tile_metadata.iterrows()}
 # EPY: END code
 
 # EPY: START code
-# this is a scaling method. Can we use image.apply here? We could, but we need H & C. Can we expose H & C (we should!)
+# this is a scaling method. It would be great to use image.apply here. It's possible, but we need to expose H & C to 
 # at least we can do it with get_slice and set_slice right now.
 
 for indices in s.image._iter_indices():
