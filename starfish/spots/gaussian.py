@@ -64,9 +64,8 @@ class GaussianSpotDetector:
         return intensities
 
     def _to_encoder_dataframe(self, bit_map_flag):
-        self.stack.squeeze(bit_map_flag=bit_map_flag)
-        mapping = self.stack.squeeze_map
-        inds = range(len(self.stack.squeeze_map))
+        mapping = self.stack.tile_metadata
+        inds = range(mapping.shape[0])
         d = dict(zip(inds, self.intensities))
         d['spot_id'] = range(self.num_objs)
 
