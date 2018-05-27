@@ -1,13 +1,15 @@
 import collections
 import math
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 import numpy as np
 import pandas as pd
 from skimage.measure import regionprops, label
+from skimage.measure._regionprops import _RegionProperties
 from sklearn.neighbors import NearestNeighbors
 
 from starfish.munge import melt
+from starfish.io import Stack
 from ._base import PixelFinderAlgorithmBase
 
 
@@ -20,16 +22,21 @@ class PixelSpotDetector(PixelFinderAlgorithmBase):
     def __init__(
             self, codebook: str, distance_threshold: float=0.5176,
             magnitude_threshold: int=1, area_threshold: int=2, crop_size: int=40, **kwargs):
-        """
+        """Decode an image by first coding each pixel, then combining the results into spots
 
         Parameters
         ----------
-        codebook
-        img_size
-        distance_threshold
-        magnitude_threshold
-        area_threshold
-        crop_size
+        codebook : str
+            file mapping codewords to the genes they represent
+        distance_threshold : float
+            spots whose codewords are more than this distance from an expected code are filtered (default  0.5176)
+        magnitude_threshold : int
+            spots with intensity less than this value are filtered (default 1)
+        area_threshold : int
+            spots with total area less than this value are filtered
+        crop_size : int
+            ??? # TODO ambrosejcarr what is this?
+
         """
         self.codebook = pd.read_csv(codebook, dtype={'barcode': object})
         self.weighted_codes: pd.DataFrame = self._normalize_barcodes(self.codebook)
@@ -42,7 +49,7 @@ class PixelSpotDetector(PixelFinderAlgorithmBase):
         self.decoded_image: Optional[np.ndarray] = None
 
     @staticmethod
-    def encode(stack) -> pd.DataFrame:
+    def encode(stack: Stack) -> pd.DataFrame:
 
         sq = stack.squeeze()
         num_bits = int(stack.tile_metadata['barcode_index'].max() + 1)
@@ -63,7 +70,7 @@ class PixelSpotDetector(PixelFinderAlgorithmBase):
 
         return spots_df_tidy
 
-    def find(self, stack) -> Tuple[pd.DataFrame, _MerfishDecoderResults]:
+    def find(self, stack: Stack) -> Tuple[pd.DataFrame, _MerfishDecoderResults]:
         encoded_df: pd.DataFrame = self.encode(stack)
         img_size: Tuple[int, int] = stack.image.tile_shape
         decoded_results: self._MerfishDecoderResults = self.decode(encoded=encoded_df, img_size=img_size)
@@ -113,7 +120,7 @@ class PixelSpotDetector(PixelFinderAlgorithmBase):
 
     # TODO ambrosejcarr fill in these values + add docs
     @staticmethod
-    def _parse_pixel_traces(encoded):
+    def _parse_pixel_traces(encoded: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
         # parse spots into pixel traces, normalize and filter
         df = encoded.loc[:, ['spot_id', 'barcode_index', 'intensity']]
         # TODO this assumes that bits are sorted [they are, currently]
@@ -125,14 +132,14 @@ class PixelSpotDetector(PixelFinderAlgorithmBase):
         return pixel_traces, pixel_traces_l2_norm
 
     @staticmethod
-    def _crop(decoded_img, crop_size):
+    def _crop(decoded_img, crop_size) -> np.ndarray:
         decoded_img[:, 0:crop_size] = 0
         decoded_img[:, decoded_img.shape[1] - crop_size:] = 0
         decoded_img[0:crop_size, :] = 0
         decoded_img[decoded_img.shape[0] - crop_size:, :] = 0
         return decoded_img
 
-    def _find_spots(self, decoded_img, area_threshold):
+    def _find_spots(self, decoded_img, area_threshold) -> Tuple[List[_RegionProperties], np.ndarray, pd.DataFrame]:
         label_image = label(decoded_img, connectivity=2)
         props = regionprops(label_image)
 
