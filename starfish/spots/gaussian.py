@@ -4,7 +4,7 @@ import pandas as pd
 from showit import image
 from skimage.feature import blob_log
 
-from starfish.munge import gather
+from starfish.munge import melt
 
 
 class GaussianSpotDetector:
@@ -71,7 +71,7 @@ class GaussianSpotDetector:
 
         # TODO: (ambrosejcarr) explicitly specify data types.
         res = pd.DataFrame(d)
-        res = gather(res, 'ind', 'val', inds)
+        res = melt(res, 'ind', 'val', inds)
         res = res.infer_objects()
         res = pd.merge(res, mapping, on='ind', how='left')
 
