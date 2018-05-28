@@ -70,6 +70,8 @@ class GaussianSpotDetector(SpotFinderAlgorithmBase):
         # stick the spot_attribute tables together
         spot_attributes: SpotAttributes = pd.concat([t.data for t in spot_attributes], axis=0)
 
+        # TODO ambrosejcarr: this is where development stopped; spot_attributes is correct, but translating
+        # spot_attributes into an encoder_table is tricky without first implementing the new codebook. Do that first.
         # create an encoded table
         encoded_spots = self.encode(spot_attributes.data)
 
