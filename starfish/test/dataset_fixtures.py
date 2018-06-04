@@ -23,10 +23,7 @@ def merfish_stack() -> Stack:
         starfish.io.Stack object containing MERFISH data
     """
     s = Stack()
-    # TODO ambrosejcarr put this back after done testing
-    # s.read('https://s3.amazonaws.com/czi.starfish.data.public/test/MERFISH/fov_001/experiment.json')
-    import os
-    s.read(os.path.expanduser('~/google_drive/starfish/data/MERFISH_test/experiment.json'))
+    s.read('https://s3.amazonaws.com/czi.starfish.data.public/test/MERFISH/fov_001/experiment.json')
     return s
 
 
