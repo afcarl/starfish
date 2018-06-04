@@ -9,7 +9,7 @@ from ._base import FilterAlgorithmBase
 
 class GaussianLowPass(FilterAlgorithmBase):
 
-    def __init__(self, sigma: Union[float, Tuple[float]], is_volume: bool=False, verbose=False, **kwargs) -> None:
+    def __init__(self, sigma, is_volume: bool=False, verbose=False, **kwargs) -> None:
         """Multi-dimensional low-pass gaussian filter.
 
         Parameters
@@ -38,14 +38,14 @@ class GaussianLowPass(FilterAlgorithmBase):
             "--sigma", default=1, type=int, help="standard deviation of gaussian kernel")
 
     @staticmethod
-    def low_pass(image, sigma: Tuple[float]) -> numpy.ndarray:
+    def low_pass(image, sigma) -> numpy.ndarray:
         """Apply a Gaussian blur operation over a multi-dimensional image.
 
         Parameters
         ----------
         image : np.ndarray
             Image data
-        sigma : Tuple[float]
+        sigma : Union[float, int, Tuple]
             Standard deviation of the Gaussian kernel that will be applied. If a float, an isotropic kernel will be
             assumed, otherwise the dimensions of the kernel give (z, x, y)
 
@@ -74,9 +74,9 @@ class GaussianLowPass(FilterAlgorithmBase):
         low_pass = partial(self.low_pass, sigma=self.sigma)
         stack.image.apply(low_pass, is_volume=self.is_volume, verbose=self.verbose)
 
-        # apply to aux dict too:
-        # TODO ambrosejcarr: tonytung's changes to the aux_dict -> imagestack will be super helpful here.
-        # here, we take only the last two values of sigma, if passed, because the aux_dict is a 2d image, not a stack
-        # this will change with tony's PR. [hack alert]
-        for k, val in stack.aux_dict.items():
-            stack.aux_dict[k] = self.low_pass(val, self.sigma[-2:])
+        for k, image in stack.aux_dict.items():
+            if isinstance(self.sigma, tuple):
+                sigma = self.sigma[-len(image.shape):]
+            else:
+                sigma = self.sigma
+            stack.aux_dict[k] = self.low_pass(image, sigma)
