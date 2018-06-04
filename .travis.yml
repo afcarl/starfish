@@ -6,10 +6,8 @@ install:
 - pip install -r REQUIREMENTS-DEV.txt
 - pip install -e .
 - pip freeze
-- pip install codecov
 script:
 - set -eo pipefail
-- mkdir test-reports
 - make all
 after_success:
-- codecov
+- bash <(curl -s https://codecov.io/bash) -c

@@ -8,7 +8,7 @@ lint:
 	flake8 $(MODULES)
 
 test:
-	pytest -v -n 8 --junitxml=test-reports/junit.xml --cov=starfish
+	pytest -v -n 8 --cov starfish
 
 mypy:
 	mypy --ignore-missing-imports $(MODULES)
