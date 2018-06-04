@@ -2,9 +2,9 @@ import numpy as np
 import pytest
 from slicedimage import Tile, TileSet
 
-from starfish.io import Stack
-from starfish.image import ImageStack
 from starfish.constants import Indices, Coordinates
+from starfish.image import ImageStack
+from starfish.io import Stack
 
 
 @pytest.fixture(scope='session')
