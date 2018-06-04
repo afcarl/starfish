@@ -17,7 +17,7 @@ def get_codebook(tempdir):
         return os.path.join(tempdir, "formatted", document['codebook'])
 
 
-class TestWithIssData(unittest.TestCase):
+class test_iss_pipeline(unittest.TestCase):
     SUBDIRS = (
         "raw",
         "formatted",
@@ -93,10 +93,10 @@ class TestWithIssData(unittest.TestCase):
             print(" ".join(stage[:2]), " ==> {} seconds".format(interval))
 
         try:
-            for subdir in TestWithIssData.SUBDIRS:
+            for subdir in test_iss_pipeline.SUBDIRS:
                 os.makedirs("{tempdir}".format(
                     tempdir=os.path.join(tempdir, subdir)))
-            for stage in TestWithIssData.STAGES:
+            for stage in test_iss_pipeline.STAGES:
                 cmdline = [
                     element(tempdir=tempdir) if callable(element) else element
                     for element in stage

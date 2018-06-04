@@ -2,10 +2,13 @@ SHELL := /bin/bash
 
 MODULES=starfish tests examples
 
-all:	lint mypy test
+all:	lint mypy pytest
 
 lint:
 	flake8 $(MODULES)
+
+pytest:
+	pytest -v -n 8 --junitxml=test-reports/junit.xml --cov=starfish
 
 mypy:
 	mypy --ignore-missing-imports $(MODULES)

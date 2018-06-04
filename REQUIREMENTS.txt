@@ -2,6 +2,8 @@ click
 matplotlib
 numpy != 1.13.0
 pandas
+pytest
+pytest-xdist
 regional
 requests
 scikit-image
