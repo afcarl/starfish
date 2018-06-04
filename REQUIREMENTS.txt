@@ -9,6 +9,7 @@ requests
 scikit-image
 scipy
 showit
+scikit-learn
 slicedimage == 0.0.0-dev17
 tqdm
 trackpy
