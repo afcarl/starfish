@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-MODULES=starfish tests examples
+MODULES=starfish examples
 
 all:	lint mypy pytest
 
