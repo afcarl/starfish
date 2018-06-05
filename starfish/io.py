@@ -1,6 +1,7 @@
 import json
 import os
 from collections import defaultdict
+from typing import Optional, Mapping
 
 import numpy as np
 import pandas as pd
@@ -28,6 +29,28 @@ class Stack:
         # backend & baseurl
         self.backend = None
         self.baseurl = None
+
+    @classmethod
+    def from_data(cls, image_stack: ImageStack, aux_dict: Optional[Mapping[str, ImageStack]]=None):
+        """create a Stack from an already-loaded ImageStack
+
+        Parameters
+        ----------
+        image_stack : ImageStack
+            in-memory ImageStack
+        aux_dict : Optional[Mapping[str, ImageStack]]
+            a dictionary of ImageStacks, default None
+
+        Returns
+        -------
+        Stack :
+            a Stack object
+
+        """
+        stack = cls()
+        stack.image = image_stack
+        stack.aux_dict = aux_dict if aux_dict is not None else dict()
+        return stack
 
     def read(self, in_json_path_or_url):
         self.backend, name, self.baseurl = resolve_path_or_url(in_json_path_or_url)
